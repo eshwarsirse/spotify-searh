@@ -28,7 +28,9 @@ func (a *Application) loadRoutes() {
 }
 
 func (a *Application) addRoutes() {
+	a.addIndex()
 	a.addHealthChecks()
+	a.addLoginRoutes()
 }
 
 func (a *Application) StartServer(port int) error {
