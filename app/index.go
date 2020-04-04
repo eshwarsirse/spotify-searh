@@ -7,7 +7,7 @@ import (
 
 func (a *Application) Index(w http.ResponseWriter, r *http.Request) {
 
-	resp := struct{
+	resp := struct {
 		Msg string `json:"msg"`
 	}{
 		"Welcome to Spotify Search Service",

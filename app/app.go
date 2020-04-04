@@ -5,11 +5,14 @@ import (
 	"github.com/urfave/negroni"
 	"log"
 	"net/http"
+	"spotify-search/provider"
+	"spotify-search/services"
 	"strconv"
 )
 
 type Application struct {
-	router        *mux.Router
+	router    *mux.Router
+	searchSVC provider.SearchAPI
 }
 
 func CreateApplication() Application {
@@ -20,6 +23,12 @@ func CreateApplication() Application {
 
 func (a *Application) load() {
 	a.loadRoutes()
+
+	searchService, err := services.NewSearchAPI()
+	if err != nil {
+		panic(err)
+	}
+	a.searchSVC = searchService
 }
 
 func (a *Application) loadRoutes() {
@@ -30,7 +39,7 @@ func (a *Application) loadRoutes() {
 func (a *Application) addRoutes() {
 	a.addIndex()
 	a.addHealthChecks()
-	a.addLoginRoutes()
+	a.addSearchRoute()
 }
 
 func (a *Application) StartServer(port int) error {
