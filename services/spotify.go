@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"fmt"
+	"github.com/spf13/viper"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -13,32 +14,32 @@ import (
 )
 
 const (
-	SpotifyBaseURL    = "https://api.spotify.com"
 	SpotifySearchPath = "/v1/search"
 )
 
 type searchAPI struct {
 	token         *models.Token
 	authenticator provider.Authenticator
+	config *viper.Viper
 }
 
 //NewSearchAPI returns an implementation of SearchAPI interface
-func NewSearchAPI() (provider.SearchAPI, error) {
-	authenticator := NewAuthenticator()
+func NewSearchAPI(config *viper.Viper) (provider.SearchAPI, error) {
+	authenticator := NewAuthenticator(config)
 	token, err := authenticator.GenerateAccessToken()
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &searchAPI{token: token, authenticator: authenticator}, nil
+	return &searchAPI{token: token, authenticator: authenticator, config: config}, nil
 }
 
 //Search implements Spotify search API
 //https://developer.spotify.com/documentation/web-api/reference/search/search/
 func (s *searchAPI) Search(query string, searchtype string, limit int, offset int) ([]byte, error) {
 
-	searchURL, err := url.Parse(SpotifyBaseURL)
+	searchURL, err := url.Parse(s.config.GetString("SPOTIFY_BASE_URL"))
 	if err != nil {
 		return nil, err
 	}

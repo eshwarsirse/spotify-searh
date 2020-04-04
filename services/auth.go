@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/spf13/viper"
 	"log"
 	"net/http"
 	"net/url"
@@ -14,23 +15,23 @@ import (
 )
 
 const (
-	SpotifyLoginURL  = "https://accounts.spotify.com"
 	SpotifyLoginPath = "/api/token"
 )
 
 type authenticator struct {
 	client *http.Client
+	config *viper.Viper
 }
 
 //NewAuthenticator will return an implementation of Authenticator interface
-func NewAuthenticator() provider.Authenticator {
-	return &authenticator{client:&http.Client{}}
+func NewAuthenticator(config *viper.Viper) provider.Authenticator {
+	return &authenticator{client: &http.Client{}, config: config}
 }
 
 //GenerateAccessToken gets access token for given app credentials using below flow
 //https://developer.spotify.com/documentation/general/guides/authorization-guide/#client-credentials-flow
 func (a *authenticator) GenerateAccessToken() (*models.Token, error) {
-	loginURL, err := url.Parse(SpotifyLoginURL)
+	loginURL, err := url.Parse(a.config.GetString("SPOTIFY_ACCOUNTS_BASE_URL"))
 	if err != nil {
 		return nil, err
 	}
@@ -44,10 +45,12 @@ func (a *authenticator) GenerateAccessToken() (*models.Token, error) {
 		return nil, err
 	}
 
-	basicToken := base64.StdEncoding.EncodeToString([]byte(provider.ClientID + ":" + provider.ClientSecret))
+	clientID := a.config.GetString("SPOTIFY_CLIENT_ID")
+	clientSecret := a.config.GetString("SPOTIFY_CLIENT_SECRET")
+	basicToken := base64.StdEncoding.EncodeToString([]byte(clientID + ":" + clientSecret))
+
 	req.Header.Add("Authorization", fmt.Sprintf("Basic %s", basicToken))
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-
 
 	resp, err := a.client.Do(req)
 	if err != nil {

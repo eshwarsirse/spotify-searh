@@ -8,11 +8,13 @@ import (
 	"spotify-search/provider"
 	"spotify-search/services"
 	"strconv"
+	"github.com/spf13/viper"
 )
 
 type Application struct {
 	router    *mux.Router
 	searchSVC provider.SearchAPI
+	config        *viper.Viper
 }
 
 func CreateApplication() Application {
@@ -22,9 +24,10 @@ func CreateApplication() Application {
 }
 
 func (a *Application) load() {
+	a.loadConfig()
 	a.loadRoutes()
 
-	searchService, err := services.NewSearchAPI()
+	searchService, err := services.NewSearchAPI(a.config)
 	if err != nil {
 		panic(err)
 	}

@@ -11,5 +11,5 @@ type Token struct {
 }
 
 func (t *Token) IsExpired() bool {
-	return t.Expiry.After(time.Now())
+	return t.Expiry.Before(time.Now())
 }
