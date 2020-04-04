@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"spotify-search/models"
@@ -21,6 +22,7 @@ type searchAPI struct {
 	authenticator provider.Authenticator
 }
 
+//NewSearchAPI returns an implementation of SearchAPI interface
 func NewSearchAPI() (provider.SearchAPI, error) {
 	authenticator := NewAuthenticator()
 	token, err := authenticator.GenerateAccessToken()
@@ -32,6 +34,8 @@ func NewSearchAPI() (provider.SearchAPI, error) {
 	return &searchAPI{token: token, authenticator: authenticator}, nil
 }
 
+//Search implements Spotify search API
+//https://developer.spotify.com/documentation/web-api/reference/search/search/
 func (s *searchAPI) Search(query string, searchtype string, limit int, offset int) ([]byte, error) {
 
 	searchURL, err := url.Parse(SpotifyBaseURL)
@@ -80,6 +84,7 @@ func (s *searchAPI) Search(query string, searchtype string, limit int, offset in
 
 func (s *searchAPI) validateToken() error {
 	if s.token.IsExpired() {
+		log.Println("AccessToken expired, renewing it..")
 		token, err := s.authenticator.GenerateAccessToken()
 		if err != nil {
 			return err

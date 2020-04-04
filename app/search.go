@@ -1,23 +1,25 @@
 package app
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
 )
 
+//Search accepts query, type, limit(optional), offset(optional) for each request.
 func (a *Application) Search(w http.ResponseWriter, r *http.Request) {
 	queryValues := r.URL.Query()
 
 	searchQuery := queryValues.Get("query")
 	if len(searchQuery) <= 0 {
-		a.writeError(w, "missing query param")
+		a.writeError(w, "Missing 'query' param")
 		return
 	}
 
 	searchType := queryValues.Get("type")
 	if len(searchType) <= 0 {
-		a.writeError(w, "missing search type")
+		a.writeError(w, "Missing 'type' param")
 		return
 	}
 
@@ -28,7 +30,7 @@ func (a *Application) Search(w http.ResponseWriter, r *http.Request) {
 	if len(limit) > 0 {
 		searchLimit, err = strconv.Atoi(limit)
 		if err != nil {
-			a.writeError(w, "invalid limit format")
+			a.writeError(w, "Invalid 'limit' param")
 			return
 		}
 	}
@@ -37,7 +39,7 @@ func (a *Application) Search(w http.ResponseWriter, r *http.Request) {
 	if len(offset) > 0 {
 		searchOffset, err = strconv.Atoi(offset)
 		if err != nil {
-			a.writeError(w, "invalid offset format")
+			a.writeError(w, "Invalid 'offset' param")
 			return
 		}
 	}
@@ -57,7 +59,12 @@ func (a *Application) Search(w http.ResponseWriter, r *http.Request) {
 
 func (a *Application) writeError(w http.ResponseWriter, msg string) {
 	w.WriteHeader(http.StatusBadRequest)
-	_, _ = w.Write([]byte(msg))
+	err := struct {
+		Description string `json:"description"`
+	}{
+		msg,
+	}
+	_ = json.NewEncoder(w).Encode(err)
 }
 
 func (a *Application) addSearchRoute() {
