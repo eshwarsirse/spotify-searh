@@ -64,6 +64,7 @@ func (a *Application) writeError(w http.ResponseWriter, msg string) {
 	}{
 		msg,
 	}
+	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(err)
 }
 

@@ -2,19 +2,19 @@ package app
 
 import (
 	"github.com/gorilla/mux"
+	"github.com/spf13/viper"
 	"github.com/urfave/negroni"
 	"log"
 	"net/http"
 	"spotify-search/provider"
 	"spotify-search/services"
 	"strconv"
-	"github.com/spf13/viper"
 )
 
 type Application struct {
 	router    *mux.Router
 	searchSVC provider.SearchAPI
-	config        *viper.Viper
+	config    *viper.Viper
 }
 
 func CreateApplication() Application {
