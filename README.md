@@ -11,3 +11,8 @@ go build -o application .
 
 ##curl command
 curl --request GET 'localhost:8080/search?query=drake&type=artist,album'
+
+##Docker
+docker build -t spotify-search .
+
+docker run --network=host  spotify-search

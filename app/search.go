@@ -60,7 +60,7 @@ func (a *Application) Search(w http.ResponseWriter, r *http.Request) {
 func (a *Application) writeError(w http.ResponseWriter, msg string) {
 	w.WriteHeader(http.StatusBadRequest)
 	err := struct {
-		Description string `json:"description"`
+		Description string `json:"error"`
 	}{
 		msg,
 	}

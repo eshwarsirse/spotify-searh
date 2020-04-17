@@ -66,7 +66,7 @@ func TestApplication_Search(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			req, err := http.NewRequest("GET", "/search", nil)
 			if err != nil {
-				t.Errorf("TestActivateSpotifyUser(). Error in creating request: %v", err)
+				t.Errorf("Search(). Error in creating request: %v", err)
 			}
 
 			q := req.URL.Query()
